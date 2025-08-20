@@ -1,0 +1,12 @@
+{
+  "name": "js-challange",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node initial-project.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
