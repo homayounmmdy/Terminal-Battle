@@ -10,7 +10,6 @@ function createHTMLProject(folderName) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${folderName}</title>
     <script src="./scripts.js"></script>
-    <h1></h1>
 </head>
 <body>
 </body>
@@ -19,9 +18,7 @@ function createHTMLProject(folderName) {
     const jsContent = `
 
 // Main application logic
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
-    
+document.addEventListener('DOMContentLoaded', function() {    
     // Add your JavaScript code here
 
 
@@ -30,9 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // to do change this code
-function initializeApp() {
-    console.log('Application initialized');
-    
+function initializeApp() {    
     // Example: Add a welcome message to the body
     const welcomeMessage = document.createElement('h1');
     welcomeMessage.textContent = 'Welcome to js challenge ${folderName}!';
