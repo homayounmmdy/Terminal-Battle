@@ -7,13 +7,13 @@ export interface Challenge {
     input: string;
     output: string;
   }[];
-  solution: string;
+  detailedDescription? : string;
 }
 
 export interface Directory {
   name: string;
   path: string;
-  challenges: Challenge[];
+  battles: Challenge[];
 }
 
 export interface TerminalState {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Challenge } from '@/types';
-import { challengesData } from '@/lib/challenges';
+import { battlesData } from '@/lib/battles';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error';
@@ -57,7 +57,7 @@ export default function Terminal() {
       case 'cd':
         handleCd(arg);
         break;
-      case 'cat':
+      case 'open':
         handleCat(arg);
         break;
       case 'pwd':
@@ -65,9 +65,6 @@ export default function Terminal() {
         break;
       case 'clear':
         handleClear();
-        break;
-      case 'solution':
-        handleSolution();
         break;
       default:
         addOutput(`Command not found: ${cmd}. Type "help" for available commands.`, 'error');
@@ -82,30 +79,27 @@ export default function Terminal() {
 
   const handleHelp = () => {
     addOutput('Available commands:');
-    addOutput('  ls              - List directories and challenges');
-    addOutput('  cd <directory>  - Navigate to a directory');
-    addOutput('  cat <challenge> - View challenge details');
-    addOutput('  pwd             - Print current directory');
-    addOutput('  solution        - Show solution for current challenge');
-    addOutput('  clear           - Clear terminal');
-    addOutput('  help            - Show this help message');
+    addOutput('  ls                - List of battles');
+    addOutput('  cd <directory>    - Navigate to a battles');
+    addOutput('  open <battle id>  - View battle details');
+    addOutput('  pwd               - Print current directory');
+    addOutput('  clear             - Clear terminal');
+    addOutput('  help              - Show this help message');
     addOutput('');
   };
 
   const handleLs = () => {
     if (currentPath === '~') {
       addOutput('Directories:');
-      challengesData.forEach(dir => {
+      battlesData.forEach(dir => {
         addOutput(`  📁 ${dir.name}/`);
       });
     } else {
-      const currentDir = challengesData.find(d => d.path === currentPath);
+      const currentDir = battlesData.find(d => d.path === currentPath);
       if (currentDir) {
-        addOutput('Challenges:');
-        currentDir.challenges.forEach(challenge => {
-          const badge = challenge.difficulty === 'easy' ? '🟢' : 
-                       challenge.difficulty === 'medium' ? '🟡' : '🔴';
-          addOutput(`  ${badge} ${challenge.id} - ${challenge.title} [${challenge.difficulty}]`);
+        addOutput('battles:');
+        currentDir.battles.forEach(challenge => {
+          addOutput(`  #: ${challenge.id} - ${challenge.title} [${challenge.difficulty}]`);
         });
       }
     }
@@ -127,7 +121,7 @@ export default function Terminal() {
       return;
     }
 
-    const targetDir = challengesData.find(d => d.name === directory || d.path === `/${directory}`);
+    const targetDir = battlesData.find(d => d.name === directory || d.path === `/${directory}`);
     if (targetDir) {
       setCurrentPath(targetDir.path);
       setCurrentChallenge(null);
@@ -145,17 +139,17 @@ export default function Terminal() {
       return;
     }
 
-    const currentDir = challengesData.find(d => d.path === currentPath);
+    const currentDir = battlesData.find(d => d.path === currentPath);
     if (!currentDir) {
       addOutput('Error: Current directory not found', 'error');
       addOutput('');
       return;
     }
 
-    const challenge = currentDir.challenges.find(c => c.id === challengeId);
+    const challenge = currentDir.battles.find(c => c.id === challengeId);
     if (!challenge) {
       addOutput(`Challenge not found: ${challengeId}`, 'error');
-      addOutput('Use "ls" to see available challenges.');
+      addOutput('Use "ls" to see available battles.');
       addOutput('');
       return;
     }
@@ -182,31 +176,12 @@ export default function Terminal() {
   };
 
   const handlePwd = () => {
-    addOutput(currentPath === '~' ? '/home/challenges' : `/home/challenges${currentPath}`);
+    addOutput(currentPath === '~' ? '/home/battles' : `/home/battles${currentPath}`);
     addOutput('');
   };
 
   const handleClear = () => {
     setLines([]);
-  };
-
-  const handleSolution = () => {
-    if (!currentChallenge) {
-      addOutput('No challenge selected. Use "cat <challenge-id>" to view a challenge first.', 'error');
-      addOutput('');
-      return;
-    }
-
-    addOutput('═'.repeat(60));
-    addOutput(`💡 Solution for: ${currentChallenge.title}`);
-    addOutput('═'.repeat(60));
-    addOutput('');
-    currentChallenge.solution.split('\n').forEach(line => {
-      addOutput(line);
-    });
-    addOutput('');
-    addOutput('═'.repeat(60));
-    addOutput('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
