@@ -5,6 +5,7 @@ import { Challenge } from '@/types';
 import { battlesData } from '@/lib/battles';
 import {COMMANDS, PATHS, UI} from "@/types/constants";
 import { CreateSeparator } from '@/lib/util';
+import {useTerminalScroll} from "@/hooks/useTerminalScroll";
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error';
@@ -23,17 +24,7 @@ export default function Terminal() {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const terminalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  }, [lines]);
+  const terminalRef = useTerminalScroll([lines]);
 
   const handleCommand = (command: string) => {
     const trimmedCommand = command.trim();
@@ -150,7 +141,7 @@ export default function Terminal() {
 
     const challenge = currentDir.battles.find(c => c.id === challengeId);
     if (!challenge) {
-      addOutput(`Challenge not found: ${challengeId}`, 'error');
+      addOutput(`Battle not found: ${challengeId}`, 'error');
       addOutput(`Use "${COMMANDS.LIST}" to see available battles.`);
       addOutput('');
       return;
@@ -215,6 +206,8 @@ export default function Terminal() {
     <div 
       className="h-screen w-screen bg-black text-green-400 p-4 font-mono text-sm overflow-hidden"
       onClick={() => inputRef.current?.focus()}
+      role="application"
+      aria-label="Terminal"
     >
       <div 
         ref={terminalRef}
@@ -239,6 +232,7 @@ export default function Terminal() {
             onChange={(e) => setCurrentInput(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent outline-none text-green-400 caret-green-400"
+            aria-label="Terminal input"
             autoFocus
           />
         </div>
