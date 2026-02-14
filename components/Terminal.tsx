@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Challenge } from '@/types';
 import { battlesData } from '@/lib/battles';
+import {COMMANDS, PATHS, UI} from "@/types/constants";
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error';
@@ -12,11 +13,11 @@ interface TerminalLine {
 export default function Terminal() {
   const [lines, setLines] = useState<TerminalLine[]>([
     { type: 'output', content: 'Welcome to Terminal Battle!' },
-    { type: 'output', content: 'Type "help" to see available commands.' },
+    { type: 'output', content: `Type "${COMMANDS.HELP}" to see available commands.` },
     { type: 'output', content: '' },
   ]);
   const [currentInput, setCurrentInput] = useState('');
-  const [currentPath, setCurrentPath] = useState('~');
+  const [currentPath, setCurrentPath] = useState(PATHS.HOME as string);
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -48,26 +49,26 @@ export default function Terminal() {
     const arg = args.join(' ');
 
     switch (cmd.toLowerCase()) {
-      case 'help':
+      case COMMANDS.HELP:
         handleHelp();
         break;
-      case 'ls':
+      case COMMANDS.LIST:
         handleLs();
         break;
-      case 'cd':
+      case COMMANDS.CHANGE_DIR:
         handleCd(arg);
         break;
-      case 'open':
+      case COMMANDS.OPEN:
         handleCat(arg);
         break;
-      case 'pwd':
+      case COMMANDS.PRINT_WD:
         handlePwd();
         break;
-      case 'clear':
+      case COMMANDS.CLEAR:
         handleClear();
         break;
       default:
-        addOutput(`Command not found: ${cmd}. Type "help" for available commands.`, 'error');
+        addOutput(`Command not found: ${cmd}. Type "${COMMANDS.HELP}" for available commands.`, 'error');
     }
 
     setCurrentInput('');
@@ -79,20 +80,20 @@ export default function Terminal() {
 
   const handleHelp = () => {
     addOutput('Available commands:');
-    addOutput('  ls                - List of battles');
-    addOutput('  cd <directory>    - Navigate to a battles');
-    addOutput('  open <battle id>  - View battle details');
-    addOutput('  pwd               - Print current directory');
-    addOutput('  clear             - Clear terminal');
-    addOutput('  help              - Show this help message');
+    addOutput(`  ${COMMANDS.LIST}                      - List of battles`);
+    addOutput(`  ${COMMANDS.CHANGE_DIR} <directory>    - Navigate to a battles`);
+    addOutput(`  ${COMMANDS.OPEN} <battle id>          - View battle details`);
+    addOutput(`  ${COMMANDS.PRINT_WD}                  - Print current directory`);
+    addOutput(`  ${COMMANDS.CLEAR}                     - Clear terminal`);
+    addOutput(`  ${COMMANDS.HELP}                      - Show this help message`);
     addOutput('');
   };
 
   const handleLs = () => {
-    if (currentPath === '~') {
+    if (currentPath === PATHS.HOME) {
       addOutput('Directories:');
       battlesData.forEach(dir => {
-        addOutput(`  📁 ${dir.name}/`);
+        addOutput(`  ${UI.DIRECTORY_ICON} ${dir.name}/`);
       });
     } else {
       const currentDir = battlesData.find(d => d.path === currentPath);
@@ -107,15 +108,15 @@ export default function Terminal() {
   };
 
   const handleCd = (directory: string) => {
-    if (!directory || directory === '~' || directory === '/') {
-      setCurrentPath('~');
+    if (!directory || directory === PATHS.HOME || directory === '/') {
+      setCurrentPath(PATHS.HOME);
       setCurrentChallenge(null);
       addOutput('');
       return;
     }
 
     if (directory === '..') {
-      setCurrentPath('~');
+      setCurrentPath(PATHS.HOME);
       setCurrentChallenge(null);
       addOutput('');
       return;
@@ -133,8 +134,8 @@ export default function Terminal() {
   };
 
   const handleCat = (challengeId: string) => {
-    if (currentPath === '~') {
-      addOutput('Please navigate to a directory first using "cd <directory>"', 'error');
+    if (currentPath === PATHS.HOME) {
+      addOutput(`Please navigate to a directory first using "${COMMANDS.CHANGE_DIR} <directory>"`, 'error');
       addOutput('');
       return;
     }
@@ -149,17 +150,17 @@ export default function Terminal() {
     const challenge = currentDir.battles.find(c => c.id === challengeId);
     if (!challenge) {
       addOutput(`Challenge not found: ${challengeId}`, 'error');
-      addOutput('Use "ls" to see available battles.');
+      addOutput(`Use "${COMMANDS.LIST}" to see available battles.`);
       addOutput('');
       return;
     }
 
     setCurrentChallenge(challenge);
     
-    addOutput('═'.repeat(60));
-    addOutput(`📝 ${challenge.title}`);
+    addOutput('═'.repeat(UI.LINE_WIDTH));
+    addOutput(`${UI.NOTE_ICON} ${challenge.title}`);
     addOutput(`Difficulty: ${challenge.difficulty.toUpperCase()}`);
-    addOutput('═'.repeat(60));
+    addOutput('═'.repeat(UI.LINE_WIDTH));
     addOutput('');
     addOutput('Description:');
     addOutput(challenge.description);
@@ -171,12 +172,12 @@ export default function Terminal() {
       addOutput(`    Output: ${example.output}`);
     });
     addOutput('');
-    addOutput('═'.repeat(60));
+    addOutput('═'.repeat(UI.LINE_WIDTH));
     addOutput('');
   };
 
   const handlePwd = () => {
-    addOutput(currentPath === '~' ? '/home/battles' : `/home/battles${currentPath}`);
+    addOutput(currentPath === PATHS.HOME ? PATHS.HOME_DISPLAY : PATHS.HOME_DISPLAY + currentPath);
     addOutput('');
   };
 
