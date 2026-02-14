@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Challenge } from '@/types';
 import { battlesData } from '@/lib/battles';
 import {COMMANDS, PATHS, UI} from "@/types/constants";
+import { CreateSeparator } from '@/lib/util';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error';
@@ -157,10 +158,10 @@ export default function Terminal() {
 
     setCurrentChallenge(challenge);
     
-    addOutput('═'.repeat(UI.LINE_WIDTH));
+    addOutput(CreateSeparator());
     addOutput(`${UI.NOTE_ICON} ${challenge.title}`);
     addOutput(`Difficulty: ${challenge.difficulty.toUpperCase()}`);
-    addOutput('═'.repeat(UI.LINE_WIDTH));
+    addOutput(CreateSeparator());
     addOutput('');
     addOutput('Description:');
     addOutput(challenge.description);
@@ -172,7 +173,7 @@ export default function Terminal() {
       addOutput(`    Output: ${example.output}`);
     });
     addOutput('');
-    addOutput('═'.repeat(UI.LINE_WIDTH));
+    addOutput(CreateSeparator());
     addOutput('');
   };
 
