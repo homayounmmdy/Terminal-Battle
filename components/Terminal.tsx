@@ -11,7 +11,7 @@ interface TerminalLine {
 
 export default function Terminal() {
   const [lines, setLines] = useState<TerminalLine[]>([
-    { type: 'output', content: 'Welcome to JS-Challenge Terminal!' },
+    { type: 'output', content: 'Welcome to Terminal Battle!' },
     { type: 'output', content: 'Type "help" to see available commands.' },
     { type: 'output', content: '' },
   ]);
