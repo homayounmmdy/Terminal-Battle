@@ -1,4 +1,5 @@
 "use client";
+import useCommandHistory from "@/hooks/useCommandHistory";
 import { useTerminalScroll } from "@/hooks/useTerminalScroll";
 import { battlesData } from "@/lib/battles";
 import { CreateSeparator, getLineColor } from "@/lib/util";
@@ -20,8 +21,9 @@ export default function Terminal() {
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(
     null,
   );
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const { addCommand, navigateUp, navigateDown } = useCommandHistory();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useTerminalScroll([lines]);
 
@@ -29,11 +31,7 @@ export default function Terminal() {
     const trimmedCommand = command.trim();
     if (!trimmedCommand) return;
 
-    // Add to history
-    setCommandHistory((prev) => [...prev, trimmedCommand]);
-    setHistoryIndex(-1);
-
-    // Add input line
+    addCommand(trimmedCommand);
     setLines((prev) => [
       ...prev,
       { type: "input", content: `${currentPath} $ ${trimmedCommand}` },
@@ -204,26 +202,12 @@ export default function Terminal() {
       handleCommand(currentInput);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      if (commandHistory.length > 0) {
-        const newIndex =
-          historyIndex === -1
-            ? commandHistory.length - 1
-            : Math.max(0, historyIndex - 1);
-        setHistoryIndex(newIndex);
-        setCurrentInput(commandHistory[newIndex]);
-      }
+      const newIndex = navigateUp(currentInput);
+      setCurrentInput(newIndex);
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      if (historyIndex !== -1) {
-        const newIndex = historyIndex + 1;
-        if (newIndex >= commandHistory.length) {
-          setHistoryIndex(-1);
-          setCurrentInput("");
-        } else {
-          setHistoryIndex(newIndex);
-          setCurrentInput(commandHistory[newIndex]);
-        }
-      }
+      const newInput = navigateDown(currentInput);
+      setCurrentInput(newInput);
     }
   };
 
